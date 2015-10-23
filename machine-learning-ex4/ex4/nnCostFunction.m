@@ -62,6 +62,7 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
+%Part 1
 X=[ones(m,1) X];
 temp1=X*(Theta1');
 temp1=sigmoid(temp1);
@@ -84,35 +85,45 @@ jedi=jedi/2;
 J=jedi-part1;
 J=J/m;
 
-tri1=0;
-tri2=0;
-%Screwed up code follows.Rewrite.
+%Part 2
+lel1=zeros(size(Theta1));
+lel2=zeros(size(Theta2));
+
+del3=zeros(num_labels,1);
 for i=1:m
 	%Step 1
 	ex=X(i,:);
-	z2=ex*(Theta1');
+	ex=ex';
+	z2=Theta1*ex;
 	a2=sigmoid(z2);
-	a2=[ones(size(a2,1),1) a2];
-	z3=a2*(Theta2');
+	a2=[1;a2];
+	z3=Theta2*a2;
 	a3=sigmoid(z3);
 	%Step 2
 	for j=1:num_labels
-		del3(j)=(a3')(i)-(y(i)==j);
+		del3(j)=a3(j)-(y(i)==j);
 	end
 	%Step 3
-	death_star=(Theta2')*(del3');
-	death_star=death_star(2:end);
-	del2=death_star.*(sigmoidGradient(z2'));
-	del2=del2(2:end);
+	moo=z2';
+	kylo=(Theta2');
+	kylo=kylo(2:end,:);
+	milo=kylo*(del3);
+	del2=milo.*sigmoidGradient(z2);
 	%Step 4
-	tri2=tri2+((a2')*(del3));
-	tri1=tri1+((ex')*(del2'));	
+	lel1=lel1+(del2*(ex'));	
+	lel2=lel2+(del3*(a2'));	
 end
 
-Theta1_grad=tri1./m;
-Theta2_grad=tri2./m;
+%Step 5
+Theta1_grad=lel1./m;
+Theta2_grad=lel2./m;
 
+%Part 3
 
+Theta1_grad=(lel1+(lambda*Theta1))./m;
+Theta1_grad(:,1)=lel1(:,1)./m;
+Theta2_grad=(lel2+(lambda*Theta2))./m;
+Theta2_grad(:,1)=lel2(:,1)./m;
 
 % -------------------------------------------------------------
 
